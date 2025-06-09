@@ -1,0 +1,54 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: room-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        retry.backoff.ms: 1000
+        reconnect.backoff.ms: 1000
+        reconnect.backoff.max.ms: 5000
+    consumer:
+      group-id: room-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.roomreservation.*"
+        retry.backoff.ms: 1000
+        reconnect.backoff.ms: 1000
+        reconnect.backoff.max.ms: 5000
+    admin:
+      properties:
+        retry.backoff.ms: 1000
+        reconnect.backoff.ms: 1000
+        reconnect.backoff.max.ms: 5000
+    listener:
+      missing-topics-fatal: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always 

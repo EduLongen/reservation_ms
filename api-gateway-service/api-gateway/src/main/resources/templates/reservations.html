@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reservation System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --apple-blue: #0071e3;
+            --apple-gray: #f5f5f7;
+            --apple-dark-gray: #86868b;
+            --apple-light-gray: #fbfbfd;
+            --apple-success: #34c759;
+            --apple-danger: #ff3b30;
+            --apple-border-radius: 12px;
+            --apple-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
+            background-color: var(--apple-light-gray);
+            color: #1d1d1f;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 1200px;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-weight: 600;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.015em;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--apple-border-radius);
+            border: none;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--apple-shadow);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1d1d1f;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d2d2d7;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+        
+        label {
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--apple-blue);
+            border-color: var(--apple-blue);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #0062cc;
+            border-color: #0062cc;
+        }
+        
+        .btn-success {
+            background-color: var(--apple-success);
+            border-color: var(--apple-success);
+        }
+        
+        .btn-success:hover, .btn-success:focus {
+            background-color: #2db34a;
+            border-color: #2db34a;
+        }
+        
+        .btn-danger {
+            background-color: var(--apple-danger);
+            border-color: var(--apple-danger);
+        }
+        
+        .btn-danger:hover, .btn-danger:focus {
+            background-color: #e62e24;
+            border-color: #e62e24;
+        }
+        
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table th {
+            font-weight: 500;
+            color: var(--apple-dark-gray);
+            border-bottom: 1px solid #d2d2d7;
+            background-color: white;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .table td {
+            border-bottom: 1px solid #f2f2f7;
+            padding: 1rem;
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .room-available {
+            color: var(--apple-success);
+            font-weight: 500;
+        }
+        
+        .room-occupied {
+            color: var(--apple-danger);
+            font-weight: 500;
+        }
+        
+        .alert {
+            border-radius: var(--apple-border-radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            box-shadow: var(--apple-shadow);
+        }
+        
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .bi {
+            font-size: 1.1rem;
+        }
+        
+        .modal-content {
+            border-radius: var(--apple-border-radius);
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1d1d1f;
+        }
+        
+        /* Apple-style switch */
+        .form-check-input:checked {
+            background-color: var(--apple-blue);
+            border-color: var(--apple-blue);
+        }
+        
+        /* Fancy form elements */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23212529' viewBox='0 0 16 16'%3E%3Cpath d='M8 9.5a.5.5 0 0 1-.354-.146l-4-4a.5.5 0 0 1 .708-.708L8 8.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.354.146z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            padding-right: 2.5rem;
+        }
+        
+        /* Divider style */
+        .divider {
+            height: 1px;
+            background-color: #f2f2f7;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Room Reservation</h1>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${message}" th:classappend="'alert alert-' + ${messageType}" th:text="${message}"></div>
+
+        <!-- New Reservation Form -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calendar-plus"></i> New Reservation
+            </div>
+            <div class="card-body">
+                <form th:action="@{/reservations/save}" method="post">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="roomId">Room</label>
+                                <select class="form-control" id="roomId" name="roomId" required>
+                                    <option value="">Select a room</option>
+                                    <option th:each="room : ${rooms}" 
+                                            th:value="${room.id}"
+                                            th:text="${room.name} + ' (Capacity: ' + ${room.capacity} + ')'">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="userId">User</label>
+                                <select class="form-control" id="userId" name="userId" required>
+                                    <option value="">Select a user</option>
+                                    <option th:each="user : ${users}" 
+                                            th:value="${user.id}"
+                                            th:text="${user.name} + ' (' + ${user.email} + ')'">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="dateTime">Date and Time</label>
+                                <input type="datetime-local" class="form-control" id="dateTime" name="dateTime" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Reserve</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <!-- New User Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-person-plus"></i> New User
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/reservations/users}" method="post">
+                            <div class="mb-3">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Create User</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Users List -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-people"></i> Users
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}">
+                                        <td th:text="${user.name}"></td>
+                                        <td th:text="${user.email}"></td>
+                                        <td>
+                                            <button class="btn btn-icon btn-outline-primary edit-user" 
+                                                    th:data-id="${user.id}" 
+                                                    th:data-name="${user.name}" 
+                                                    th:data-email="${user.email}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-icon btn-outline-danger delete-user" 
+                                                    th:data-id="${user.id}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- New Room Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-building-add"></i> New Room
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/reservations/rooms}" method="post">
+                            <div class="mb-3">
+                                <label for="roomName">Room Name</label>
+                                <input type="text" class="form-control" id="roomName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="capacity">Capacity</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Create Room</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Rooms List -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-building"></i> Available Rooms
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Capacity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="room : ${rooms}">
+                                        <td th:text="${room.name}"></td>
+                                        <td th:text="${room.capacity}"></td>
+                                        <td>
+                                            <span th:if="${room.available}" class="room-available">Available</span>
+                                            <span th:unless="${room.available}" class="room-occupied">Occupied</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-icon btn-outline-primary edit-room" 
+                                                    th:data-id="${room.id}" 
+                                                    th:data-name="${room.name}" 
+                                                    th:data-capacity="${room.capacity}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-icon btn-outline-danger delete-room" 
+                                                    th:data-id="${room.id}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservations List -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calendar-check"></i> Existing Reservations
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Room</th>
+                                <th>User</th>
+                                <th>Date/Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation : ${reservations}">
+                                <td th:text="${reservation.roomName}"></td>
+                                <td th:text="${reservation.userName}"></td>
+                                <td th:text="${reservation.formattedDateTime != null ? reservation.formattedDateTime : reservation.dateTime}"></td>
+                                <td>
+                                    <button class="btn btn-icon btn-outline-danger delete-reservation" 
+                                            th:data-id="${reservation.id}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit User -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-user-form">
+                        <input type="hidden" id="edit-user-id">
+                        <div class="mb-3">
+                            <label for="edit-user-name">Name</label>
+                            <input type="text" class="form-control" id="edit-user-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-user-email">Email</label>
+                            <input type="email" class="form-control" id="edit-user-email" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-user-edit">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Room -->
+    <div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-room-form">
+                        <input type="hidden" id="edit-room-id">
+                        <div class="mb-3">
+                            <label for="edit-room-name">Name</label>
+                            <input type="text" class="form-control" id="edit-room-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-room-capacity">Capacity</label>
+                            <input type="number" class="form-control" id="edit-room-capacity" min="1" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-room-edit">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modals
+            const userModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            const roomModal = new bootstrap.Modal(document.getElementById('editRoomModal'));
+            
+            // Edit User
+            document.querySelectorAll('.edit-user').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    const email = this.getAttribute('data-email');
+                    
+                    document.getElementById('edit-user-id').value = id;
+                    document.getElementById('edit-user-name').value = name;
+                    document.getElementById('edit-user-email').value = email;
+                    
+                    userModal.show();
+                });
+            });
+            
+            // Save User Edit
+            document.getElementById('save-user-edit').addEventListener('click', function() {
+                const id = document.getElementById('edit-user-id').value;
+                const name = document.getElementById('edit-user-name').value;
+                const email = document.getElementById('edit-user-email').value;
+                
+                fetch(`/reservations/users/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        userModal.hide();
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving user data');
+                });
+            });
+            
+            // Edit Room
+            document.querySelectorAll('.edit-room').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    const capacity = this.getAttribute('data-capacity');
+                    
+                    document.getElementById('edit-room-id').value = id;
+                    document.getElementById('edit-room-name').value = name;
+                    document.getElementById('edit-room-capacity').value = capacity;
+                    
+                    roomModal.show();
+                });
+            });
+            
+            // Save Room Edit
+            document.getElementById('save-room-edit').addEventListener('click', function() {
+                const id = document.getElementById('edit-room-id').value;
+                const name = document.getElementById('edit-room-name').value;
+                const capacity = document.getElementById('edit-room-capacity').value;
+                
+                fetch(`/reservations/rooms/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, capacity }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        roomModal.hide();
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving room data');
+                });
+            });
+            
+            // Delete Reservation
+            document.querySelectorAll('.delete-reservation').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this reservation?')) {
+                        const id = this.getAttribute('data-id');
+                        
+                        fetch(`/reservations/${id}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                window.location.reload();
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting reservation');
+                        });
+                    }
+                });
+            });
+            
+            // Delete Room
+            document.querySelectorAll('.delete-room').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this room?')) {
+                        const id = this.getAttribute('data-id');
+                        
+                        fetch(`/reservations/rooms/${id}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                window.location.reload();
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting room');
+                        });
+                    }
+                });
+            });
+            
+            // Delete User
+            document.querySelectorAll('.delete-user').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this user?')) {
+                        const id = this.getAttribute('data-id');
+                        
+                        fetch(`/reservations/users/${id}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                window.location.reload();
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting user');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
