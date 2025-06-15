@@ -41,11 +41,13 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest request) {
-        LocalDateTime dateTime = LocalDateTime.parse(request.getDateTime(), formatter);
+        LocalDateTime startDateTime = LocalDateTime.parse(request.getStartDateTime(), formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(request.getEndDateTime(), formatter);
         Reservation reservation = reservationService.createReservation(
             request.getRoomId(),
             request.getUserId(),
-            dateTime
+            startDateTime,
+            endDateTime
         );
         return ResponseEntity.ok(toResponse(reservation));
     }
@@ -61,7 +63,8 @@ public class ReservationController {
             reservation.getId(),
             reservation.getRoomId(),
             reservation.getUserId(),
-            reservation.getDateTime().format(formatter)
+            reservation.getStartDateTime().format(formatter),
+            reservation.getEndDateTime().format(formatter)
         );
     }
 } 

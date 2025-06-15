@@ -4,13 +4,15 @@ public class ReservationResponse {
     private Long id;
     private Long roomId;
     private Long userId;
-    private String dateTime;
+    private String startDateTime;
+    private String endDateTime;
 
-    public ReservationResponse(Long id, Long roomId, Long userId, String dateTime) {
+    public ReservationResponse(Long id, Long roomId, Long userId, String startDateTime, String endDateTime) {
         this.id = id;
         this.roomId = roomId;
         this.userId = userId;
-        this.dateTime = dateTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
     }
 
     // getters and setters
@@ -20,6 +22,8 @@ public class ReservationResponse {
     public void setRoomId(Long roomId) { this.roomId = roomId; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
-    public String getDateTime() { return dateTime; }
-    public void setDateTime(String dateTime) { this.dateTime = dateTime; }
+    public String getStartDateTime() { return startDateTime; }
+    public void setStartDateTime(String startDateTime) { this.startDateTime = startDateTime; }
+    public String getEndDateTime() { return endDateTime; }
+    public void setEndDateTime(String endDateTime) { this.endDateTime = endDateTime; }
 } 

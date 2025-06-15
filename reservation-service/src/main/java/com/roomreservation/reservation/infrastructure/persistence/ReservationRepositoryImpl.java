@@ -183,7 +183,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public List<Reservation> findByRoomIdAndDateTimeBetween(Long roomId, LocalDateTime start, LocalDateTime end) {
-        return jpaRepository.findByRoomIdAndDateTimeBetween(roomId, start, end).stream()
+        return jpaRepository.findByRoomIdAndStartDateTimeBetween(roomId, start, end).stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
     }
@@ -207,16 +207,18 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         entity.setId(reservation.getId());
         entity.setRoomId(reservation.getRoomId());
         entity.setUserId(reservation.getUserId());
-        entity.setDateTime(reservation.getDateTime());
+        entity.setStartDateTime(reservation.getStartDateTime());
+        entity.setEndDateTime(reservation.getEndDateTime());
         return entity;
     }
 
     private Reservation toDomain(ReservationJpaEntity entity) {
         return new Reservation(
                 entity.getId(),
+                entity.getStartDateTime(),
+                entity.getEndDateTime(),
                 entity.getRoomId(),
-                entity.getUserId(),
-                entity.getDateTime()
+                entity.getUserId()
         );
     }
 } 

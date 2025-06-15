@@ -145,11 +145,22 @@
         .room-available {
             color: var(--apple-success);
             font-weight: 500;
+            display: flex;
+            align-items: center;
         }
         
         .room-occupied {
             color: var(--apple-danger);
             font-weight: 500;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .room-occupied .small {
+            font-size: 0.8rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 2px;
         }
         
         .alert {
@@ -243,7 +254,7 @@
             <div class="card-body">
                 <form th:action="@{/reservations/save}" method="post">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="roomId">Room</label>
                                 <select class="form-control" id="roomId" name="roomId" required>
@@ -255,7 +266,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="userId">User</label>
                                 <select class="form-control" id="userId" name="userId" required>
@@ -267,10 +278,18 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="dateTime">Date and Time</label>
-                                <input type="datetime-local" class="form-control" id="dateTime" name="dateTime" required>
+                                <label for="startDateTime">Start Date and Time</label>
+                                <input type="datetime-local" class="form-control" id="startDateTime" name="startDateTime" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="endDateTime">End Date and Time</label>
+                                <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" required>
                             </div>
                         </div>
                     </div>
@@ -366,7 +385,7 @@
                 <!-- Rooms List -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-building"></i> Available Rooms
+                        <i class="bi bi-building"></i> Rooms Status
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -384,8 +403,18 @@
                                         <td th:text="${room.name}"></td>
                                         <td th:text="${room.capacity}"></td>
                                         <td>
-                                            <span th:if="${room.available}" class="room-available">Available</span>
-                                            <span th:unless="${room.available}" class="room-occupied">Occupied</span>
+                                            <span th:if="${room.available}" class="room-available" data-bs-toggle="tooltip" title="This room is currently available for reservation">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Available
+                                            </span>
+                                            <span th:unless="${room.available}" class="room-occupied" data-bs-toggle="tooltip" th:title="'This room is currently occupied by ' + ${room.occupiedBy} + ' until ' + ${room.occupiedUntil}">
+                                                <i class="bi bi-x-circle-fill me-1"></i> Occupied
+                                                <span class="d-block small" th:if="${room.occupiedBy != null}">
+                                                    by <span th:text="${room.occupiedBy}"></span>
+                                                </span>
+                                                <span class="d-block small" th:if="${room.occupiedUntil != null}">
+                                                    until <span th:text="${room.occupiedUntil}"></span>
+                                                </span>
+                                            </span>
                                         </td>
                                         <td>
                                             <button class="btn btn-icon btn-outline-primary edit-room" 
@@ -420,7 +449,7 @@
                             <tr>
                                 <th>Room</th>
                                 <th>User</th>
-                                <th>Date/Time</th>
+                                <th>Period</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -428,7 +457,7 @@
                             <tr th:each="reservation : ${reservations}">
                                 <td th:text="${reservation.roomName}"></td>
                                 <td th:text="${reservation.userName}"></td>
-                                <td th:text="${reservation.formattedDateTime != null ? reservation.formattedDateTime : reservation.dateTime}"></td>
+                                <td th:text="${reservation.formattedStartTime} + ' - ' + ${reservation.formattedEndTime}"></td>
                                 <td>
                                     <button class="btn btn-icon btn-outline-danger delete-reservation" 
                                             th:data-id="${reservation.id}">
@@ -668,6 +697,15 @@
                     }
                 });
             });
+            
+            // Initialize tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            
+            // Auto-refresh the page every 60 seconds to keep room status up-to-date
+            setTimeout(function() {
+                window.location.reload();
+            }, 60000);
         });
     </script>
 </body>

@@ -24,6 +24,9 @@ public class ReservationJpaEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
+    @Column(name = "start_date_time", nullable = false)
+    private LocalDateTime startDateTime;
+
+    @Column(name = "end_date_time", nullable = false)
+    private LocalDateTime endDateTime;
 } 

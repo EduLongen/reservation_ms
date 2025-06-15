@@ -17,15 +17,16 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        retry.backoff.ms: 1000
-        reconnect.backoff.ms: 1000
-        reconnect.backoff.max.ms: 5000
+        spring.json.add.type.headers: false
+        spring.json.use.type.headers: false
     consumer:
       group-id: user-service-group
       auto-offset-reset: earliest
@@ -33,9 +34,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "com.roomreservation.*"
-        retry.backoff.ms: 1000
-        reconnect.backoff.ms: 1000
-        reconnect.backoff.max.ms: 5000
+        spring.json.use.type.headers: false
     admin:
       properties:
         retry.backoff.ms: 1000
@@ -51,4 +50,20 @@ management:
         include: health,info
   endpoint:
     health:
-      show-details: always 
+      show-details: always
+
+# Springdoc OpenAPI/Swagger configuration
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
+    config-url: /api-docs/swagger-config
+    url: /api-docs
+    doc-expansion: none 

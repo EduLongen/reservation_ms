@@ -117,16 +117,47 @@ public class ReservationController {
                 }
             }
             
-            // Mark rooms as occupied based on reservations
+            // Marcar salas como ocupadas se houver conflito de período
             for (Map room : rooms) {
                 Long roomId = Long.valueOf(room.get("id").toString());
-                boolean occupied = reservations.stream()
-                    .anyMatch(reservation -> {
-                        if (reservation.get("roomId") == null) return false;
-                        Long reservationRoomId = Long.valueOf(reservation.get("roomId").toString());
-                        return reservationRoomId.equals(roomId);
-                    });
+                boolean occupied = false;
+                String occupiedBy = null;
+                String occupiedUntil = null;
+                LocalDateTime now = LocalDateTime.now();
+
+                // Check all reservations for this room
+                for (Map reservation : reservations) {
+                    if (reservation.get("roomId") == null || reservation.get("startDateTime") == null || reservation.get("endDateTime") == null) {
+                        continue;
+                    }
+                    
+                    Long reservationRoomId = Long.valueOf(reservation.get("roomId").toString());
+                    if (!reservationRoomId.equals(roomId)) {
+                        continue;
+                    }
+                    
+                    try {
+                        LocalDateTime start = LocalDateTime.parse(reservation.get("startDateTime").toString());
+                        LocalDateTime end = LocalDateTime.parse(reservation.get("endDateTime").toString());
+                        
+                        // Check if current time is within reservation period
+                        if (now.isEqual(start) || now.isEqual(end) || 
+                            (now.isAfter(start) && now.isBefore(end))) {
+                            occupied = true;
+                            occupiedBy = reservation.get("userName").toString();
+                            occupiedUntil = end.format(DATE_FORMATTER);
+                            break;
+                        }
+                    } catch (DateTimeParseException e) {
+                        logger.error("Error parsing reservation period: {}", e.getMessage());
+                    }
+                }
+                
                 room.put("available", !occupied);
+                if (occupied) {
+                    room.put("occupiedBy", occupiedBy);
+                    room.put("occupiedUntil", occupiedUntil);
+                }
             }
 
             model.addAttribute("reservations", reservations);
@@ -156,21 +187,20 @@ public class ReservationController {
     public String save(
             @RequestParam String roomId,
             @RequestParam String userId,
-            @RequestParam String dateTime,
+            @RequestParam String startDateTime,
+            @RequestParam String endDateTime,
             Model model) {
-        
         try {
-            logger.info("Data received - RoomId: {}, UserId: {}, DateTime: {}", roomId, userId, dateTime);
+            logger.info("Data received - RoomId: {}, UserId: {}, StartDateTime: {}, EndDateTime: {}", roomId, userId, startDateTime, endDateTime);
 
-            // Create a simplified object to send to the API
             Map<String, Object> reservation = new HashMap<>();
             reservation.put("roomId", Long.parseLong(roomId));
             reservation.put("userId", Long.parseLong(userId));
-            reservation.put("dateTime", dateTime + ":00");  // Add seconds directly
+            reservation.put("startDateTime", startDateTime + ":00");
+            reservation.put("endDateTime", endDateTime + ":00");
 
             logger.info("Sending request to create reservation: {}", reservation);
-            
-            // Send the request to the reservation service
+
             ResponseEntity<Map> response = restTemplate.postForEntity(
                 "http://reservation-service:8083/api/reservations",
                 reservation,

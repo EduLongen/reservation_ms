@@ -57,4 +57,20 @@ management:
         include: health,info
   endpoint:
     health:
-      show-details: always 
+      show-details: always
+
+# Springdoc OpenAPI/Swagger configuration
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
+    config-url: /api-docs/swagger-config
+    url: /api-docs
+    doc-expansion: none 

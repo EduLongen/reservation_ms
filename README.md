@@ -32,6 +32,20 @@ docker compose logs -f
 
 Visit http://localhost:8080 to use the application. This will redirect to http://localhost:8080/reservations which is the main interface for the system.
 
+## Swagger & API Documentation
+
+Each service exposes its own Swagger (OpenAPI) documentation. You can access the interactive API docs at:
+
+- **API Gateway:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **User Service:** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+- **Room Service:** [http://localhost:8082/swagger-ui.html](http://localhost:8082/swagger-ui.html)
+- **Reservation Service:** [http://localhost:8083/swagger-ui.html](http://localhost:8083/swagger-ui.html)
+
+> **Note:**
+> - The `/swagger-ui.html` endpoint provides the interactive Swagger UI for each service.
+> - The `/api-docs` endpoint (e.g., `http://localhost:8080/api-docs`) returns the raw OpenAPI JSON specification.
+> - There is no service running on port 3000 by default.
+
 ## Important Notes
 
 ### Database Initialization

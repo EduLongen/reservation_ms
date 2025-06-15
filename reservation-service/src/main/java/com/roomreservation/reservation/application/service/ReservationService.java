@@ -21,19 +21,21 @@ public class ReservationService {
         this.eventPublisher = eventPublisher;
     }
 
-    public Reservation createReservation(Long roomId, Long userId, LocalDateTime dateTime) {
-        // Check if there's already a reservation for the room at the same time
-        List<Reservation> existingReservations = reservationRepository.findByRoomIdAndDateTimeBetween(
-            roomId, dateTime, dateTime.plusHours(1));
-        
-        if (!existingReservations.isEmpty()) {
-            throw new RuntimeException("There is already a reservation for this room at this time");
+    public Reservation createReservation(Long roomId, Long userId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        // Check if there's already a reservation for the room that overlaps with the requested period
+        List<Reservation> existingReservations = reservationRepository.findByRoomId(roomId);
+        boolean conflict = existingReservations.stream().anyMatch(r ->
+            (startDateTime.isBefore(r.getEndDateTime()) && endDateTime.isAfter(r.getStartDateTime()))
+        );
+        if (conflict) {
+            throw new RuntimeException("There is already a reservation for this room in the selected period");
         }
 
         Reservation reservation = new Reservation();
         reservation.setRoomId(roomId);
         reservation.setUserId(userId);
-        reservation.setDateTime(dateTime);
+        reservation.setStartDateTime(startDateTime);
+        reservation.setEndDateTime(endDateTime);
         
         reservation = reservationRepository.save(reservation);
         eventPublisher.publishReservationCreated(reservation);
